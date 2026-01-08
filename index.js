@@ -8,7 +8,7 @@ dotenv.config()
 const app = express()
 
 app.use(cors({
-    origin:"http://localhost:5173", //frontend cime
+    origin:process.env.FRONTEND_URL, //frontend cime
     credentials: true // engedélyezzük a sütik közlekedését
 }))
 app.use(express.json())
@@ -18,12 +18,13 @@ app.use(cookieParser())
 
 app.post("/login",(req,res)=>{
     const {key} = req.body
-    if(key!==process.env.AUTH_KEY) return res.status(401).json({error:"Hibás kulcs!"})
+    if(key!=process.env.AUTH_KEY) return res.status(401).json({error:"Hibás kulcs!"})
         const token = jwt.sign({access:true}, process.env.JWT_SECRET, {expiresIn:"2h"})
+        const isProd=process.env.NODE_ENV == "production";
     res.cookie("token",token,{
         httpOnly:true,//a JS nem fér hozzá
-        secure:false, //prod-ban true : https
-        sameSite:"strict",
+        secure:isProd, //prod-ban true : https
+        sameSite:isProd? "none":"strict",
         maxAge:2*60*60*1000,//2 órát él
     })
     res.sendStatus(200)
