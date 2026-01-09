@@ -39,14 +39,21 @@ app.get("/protected",(req,res)=>{
         jwt.verify(token, process.env.JWT_SECRET)
         res.sendStatus(200)
     } catch (error) {
-        res.send(401) //unauthorized         
+        res.sendStatus(401) //unauthorized         
     }
 }) 
 
-app.post("/logout",(req,res)=>{
-    res.clearCookie("token")
-    res.sendStatus(200)
-})
+app.post("/logout", (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "strict",
+    });
+
+    res.sendStatus(200);
+});
 
 
 
