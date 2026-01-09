@@ -18,7 +18,7 @@ app.use(cookieParser())
 
 app.post("/login",(req,res)=>{
     const {key} = req.body
-    if(key!=process.env.AUTH_KEY) return res.status(401).json({error:"Hibás kulcs!"})
+    if(key!==process.env.AUTH_KEY) return res.status(401).json({error:"Hibás kulcs!"})
         const token = jwt.sign({access:true}, process.env.JWT_SECRET, {expiresIn:"2h"})
         const isProd=process.env.NODE_ENV == "production";
     res.cookie("token",token,{
